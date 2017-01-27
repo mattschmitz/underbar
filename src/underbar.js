@@ -109,6 +109,21 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
+
+    //save all unique elements in a hash table
+    var hash = {};
+    for (var i = 0; i < array.length; i++) {
+      var el = array[i];
+      hash[el] = el;
+    }
+
+    //loop through hash table, log elements
+    var output = [];
+    for (var key in hash){
+      output.push(hash[key]);
+    }
+    return output;
+
   };
 
 
@@ -117,6 +132,8 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+
+
   };
 
   /*
