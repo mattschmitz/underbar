@@ -160,6 +160,7 @@
     });
   };
 
+
   // Reduces an array or object to a single value by repetitively calling
   // iterator(accumulator, item) for each item. accumulator should be
   // the return value of the previous iterator call.
@@ -181,7 +182,34 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+
+    //Arrays: 
+    if (Array.isArray(collection)){
+      var startVal = accumulator;
+      var startInd = 0;
+      if (startVal === undefined){
+        startVal = collection[0]
+        startInd = 1;
+      }
+
+      for (var i = startInd; i < collection.length; i++) {
+        var el = collection[i];
+        
+        startVal = iterator(startVal,el);
+      }
+
+      return startVal;
+    }
+
+    //Objects
+    else{
+      
+    }
+
+
   };
+
+
 
   // Determine if the array or object contains a given value (using `===`).
   _.contains = function(collection, target) {
