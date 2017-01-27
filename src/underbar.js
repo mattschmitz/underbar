@@ -185,37 +185,23 @@
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
 
-    var acc = accumulator;
-    var startInd = 0;
-    if (acc === undefined){
-      acc = collection[0]
-      startInd = 1;
+    //check if a start value for the accumulator was passed:
+    var hasStartVal = true; 
+    if (accumulator === undefined){
+      hasStartVal = false;
     }
 
-    //Arrays: 
-    if (Array.isArray(collection)){
-      for (var i = startInd; i < collection.length; i++) {
-        acc = iterator(acc,collection[i]);
+    //loop through, applying 
+    _.each(collection, function(item){
+      if (hasStartVal === false){ // no accumulator passed in
+        accumulator = item; //set accumulator equal to first item
+        hasStartVal = true; //update hasStartVal
       }
-    }
-
-    //Objects
-    else{
-      for (var key in collection) { //loop through all elements in collection
-        if (startInd === 1){ //i.e. if no accumulator was given
-          startInd = 0; //so that this isn't flagged again
-          acc = collection[key] //set acc to first element in collection
-        }
-        else{
-          acc = iterator(acc,collection[key]);
-        }
+      else{
+        accumulator = iterator(accumulator,item)
       }
-    }
-
-    return acc;
-
-
-
+    });
+    return accumulator;
   };
 
 
