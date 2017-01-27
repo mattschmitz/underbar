@@ -64,7 +64,6 @@
         iterator(collection[key],key,collection)
       }
 
-
   };
 
   // Returns the index at which value can be found in the array, or -1 if value
@@ -132,14 +131,20 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+
+    ////This version doesn't use _.each
+    // var output = [];
+    // for (var i = 0; i < collection.length; i++) {
+    //   output.push(iterator(collection[i]))
+    // }    
+    // return output;
+
     var output = [];
-    
-    for (var i = 0; i < collection.length; i++) {
-      output.push(iterator(collection[i]))
-    }    
-
+    _.each(collection, function(el){
+      var morphed = iterator(el);
+      output.push(morphed);
+    });
     return output;
-
   };
 
   /*
