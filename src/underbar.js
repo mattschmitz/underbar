@@ -87,6 +87,7 @@
   _.filter = function(collection, test) {
 
     var output = []
+
     for (var i = 0; i < collection.length; i++) {
       if (test(collection[i])){
         output.push(collection[i]);
@@ -111,16 +112,16 @@
 
     //save all unique elements in a hash table
     var hash = {};
-    for (var i = 0; i < array.length; i++) {
-      var el = array[i];
+    _.each(array,function(el){
       hash[el] = el;
-    }
+    });
 
-    //loop through hash table, log elements
+    //loop through hash table, add elements to output
     var output = [];
-    for (var key in hash){
-      output.push(hash[key]);
-    }
+    _.each(hash,function(el){
+      output.push(el)
+    });
+
     return output;
 
   };
