@@ -211,18 +211,47 @@
     // TIP: Many iteration problems can be most easily expressed in
     // terms of reduce(). Here's a freebie to demonstrate!
     return _.reduce(collection, function(wasFound, item) {
-      if (wasFound) {
+
+      if (wasFound) { //if it was already found, just return true
         return true;
       }
-      return item === target;
+
+      return item === target; //otherwise, return true only if the item equals the target
+
     }, false);
   };
+
+
+
+
 
 
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+
+    if (iterator === undefined){
+      iterator = function(item){return item};
+    }
+
+    return _.reduce(collection, function(wasFound,item){
+      if (!wasFound){ //if at any point there was a failure, keep returning false
+        return false;
+      }
+      else if (iterator(item)){
+        return true;
+      }
+      else{
+        return false;
+      }
+    }, true);
+
   };
+
+
+
+
+
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
