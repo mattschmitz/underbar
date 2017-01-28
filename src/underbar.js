@@ -418,8 +418,20 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var indexes = _.map(array,function(el,i){
+      return i;
+    });
 
+    var output = [];
 
+    for (var i = indexes.length; i > 0; i--) {
+      var indexOfIndex = (Math.floor(Math.random()*i))
+      var index = indexes[indexOfIndex];
+      indexes.splice(indexOfIndex,1)
+      output.push(array[index])
+    }
+
+    return output;
 
   };
 
