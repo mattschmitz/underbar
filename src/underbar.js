@@ -229,34 +229,33 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
-
-    if (iterator === undefined){
+    if (iterator === undefined){ //if no iterator, just return item
       iterator = function(item){return item};
     }
-
-    return _.reduce(collection, function(wasFound,item){
-      if (!wasFound){ //if at any point there was a failure, keep returning false
-        return false;
-      }
-      else if (iterator(item)){
-        return true;
-      }
-      else{
-        return false;
-      }
-    }, true);
-
+    return _.reduce(collection, function(passed,item){
+      if (!passed) return false; //if any item evey fails, it continues to return false (failed)
+      else return iterator(item)? true: false;
+    },true); //default value is true - e.g. for empty array
   };
-
-
-
-
 
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+
+    if (iterator === undefined){ //if no iterator, just return item
+      iterator = function(item){return item};
+    }
+
+    //reverse iterator
+    var myIterator = function(item){
+      return (!(iterator(item)))
+    }
+
+    //essentially we're seeing if every item doesn't fail, i.e.
+    //(some items pass) === (not all items fail)
+    return (!(_.every(collection,myIterator)));
   };
 
 
