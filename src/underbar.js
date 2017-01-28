@@ -279,18 +279,30 @@
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
 
-    //iterator(value, key, collection)
-    _.each(arguments,function(argument){
+    // Array.prototype.shift.apply(arguments);//uncomment to skip the first object
+    // //might be faster?
+
+    _.each(arguments,function(argument){ //loops through all the arguments 
       _.each(argument,function(value,key){
         obj[key] = value;
       })
     })  
+
     return obj;
+
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+
+    _.each(arguments,function(argument){
+      _.each(argument,function(value,key){
+        if (!(key in obj)) obj[key] = value;
+      })
+    })  
+    return obj;
+
   };
 
 
