@@ -137,8 +137,8 @@
     // return output;
 
     var output = [];
-    _.each(collection, function(el){
-      var morphed = iterator(el);
+    _.each(collection, function(value,key,collection){
+      var morphed = iterator(value,key,collection);
       output.push(morphed);
     });
     return output;
@@ -418,6 +418,9 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+
+
+
   };
 
 
