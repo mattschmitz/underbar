@@ -222,10 +222,6 @@
   };
 
 
-
-
-
-
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
@@ -347,14 +343,10 @@
   // instead if possible.
   _.memoize = function(func) {
 
-    var callList = []; //array that will store arguments and answers
-
     //create helper function arrayEquals
     var arrayEquals = function(arr1,arr2){
       var match = true;
-      if (arr1.length != arr2.length){
-        match = false;
-      }
+      if (arr1.length != arr2.length) match = false;
       else {
         _.each(arr1,function(item,key){
           if (arr2[key] != item) match = false;
@@ -363,35 +355,29 @@
       return match;
     };
 
+    var callList = []; //array for storing previous calls
+
     return function(){      
       var calledBefore = false;//assume we haven't seen the call before
-      var result;
+      var result; //initialize this variable
+      var args = arguments;
 
-      var argsArray = [];
-      for (var i = 0; i < arguments.length; i++) {
-        argsArray.push(arguments[i]);
-      }//convert arguments into a normal array,easier to work with.
-
-
-      for (var i = 0; i < callList.length; i++) {
-        var curCall = callList[i]
-        console.log(curCall[0])
-        if (arrayEquals(curCall[0],argsArray)){ //if there's a match
+      //check if the arguments given this time are already in callList
+      _.each(callList,function(curCall){
+        if (arrayEquals(curCall[0],args)){ 
           calledBefore = true;
           result = curCall[1];
-        }   
-      }   
+        } 
+      })
 
+      //if not, call function
       if (!calledBefore){
-        result = func.apply(this,arguments);
-        callList.push([argsArray,result]);
+        result = func.apply(this,args);
+        callList.push([args,result]);
       }
 
       return result;
-      //otherwise call get index of call object
     }
-
-
 
   };
 
