@@ -347,19 +347,50 @@
   // instead if possible.
   _.memoize = function(func) {
 
-    var argsAndAnswers = {};
+    var callList = []; //array that will store arguments and answers
 
-    return function(){
-      if (arguments[0] in argsAndAnswers){
-        return argsAndAnswers[arguments[0]];
+    //create helper function arrayEquals
+    var arrayEquals = function(arr1,arr2){
+      var match = true;
+      if (arr1.length != arr2.length){
+        match = false;
+      }
+      else {
+        _.each(arr1,function(item,key){
+          if (arr2[key] != item) match = false;
+        });
+      }
+      return match;
+    };
+
+    return function(){      
+      var calledBefore = false;//assume we haven't seen the call before
+      var result;
+
+      var argsArray = [];
+      for (var i = 0; i < arguments.length; i++) {
+        argsArray.push(arguments[i]);
+      }//convert arguments into a normal array,easier to work with.
+
+
+      for (var i = 0; i < callList.length; i++) {
+        var curCall = callList[i]
+        console.log(curCall[0])
+        if (arrayEquals(curCall[0],argsArray)){ //if there's a match
+          calledBefore = true;
+          result = curCall[1];
+        }   
+      }   
+
+      if (!calledBefore){
+        result = func.apply(this,arguments);
+        callList.push([argsArray,result]);
       }
 
-      else{
-        var result = func.apply(this,arguments);
-        argsAndAnswers[arguments[0]] = result;
-        return result;
-      }
+      return result;
+      //otherwise call get index of call object
     }
+
 
 
   };
