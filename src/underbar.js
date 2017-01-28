@@ -388,6 +388,33 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    
+      // var makeStopwatch = function(){
+      //   var elapsed = 0;
+      //   // var stopwatch = function(){return elapsed};
+      //   var increase = function(){ elapsed++ };
+      //   setInterval(increase,1)
+
+      //   return stopwatch
+      // }
+
+      // var stopwatch1 = makeStopwatch();
+
+      var called = false;
+
+      var myFunction = function(){
+        if(called){
+          clearInterval(myInterval);
+        }
+        else{
+          func.apply(this, arguments);
+          called = true;
+        }
+      }
+
+      var myInterval = setInterval.apply(myFunction,arguments);
+
+
   };
 
 
