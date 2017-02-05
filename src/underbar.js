@@ -39,9 +39,7 @@
   // last element.
   _.last = function(array, n) {
     var len = array.length;
-    if (n>len) return array;
-    return n === undefined ? array[len-1] : array.slice(len-n,len);
-
+    return n === undefined ? array[len-1] : array.slice(Math.max(0,len-n));
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -50,20 +48,18 @@
   // Note: _.each does not have a return value, but rather simply runs the
   // iterator function over each item in the input collection.
   _.each = function(collection, iterator) {
-
     //Arrays: 
     if (Array.isArray(collection)){
       for (var i = 0; i < collection.length; i++) {
         iterator(collection[i],i,collection);
       }
     }
-
     //objects
-    else
+    else {
       for (var key in collection) {
-        iterator(collection[key],key,collection)
+        iterator(collection[key],key,collection);
       }
-
+    }
   };
 
   // Returns the index at which value can be found in the array, or -1 if value
@@ -83,42 +79,40 @@
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
-    var output = []
-    _.each(collection,function(el){
-      if (test(el)){
-        output.push(el);
+    var results = []
+    _.each(collection,function(value){
+      if (test(value)){
+        results.push(value);
       } 
     })
-    return output;
+    return results;
   };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
-    var reverseTest = function(el){
-      return (!test(el))
+    var reverseTest = function(value){
+      return (!test(value));
     }
     return _.filter(collection, reverseTest);
-    
   };
+
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
 
-    //save all unique elements in a hash table
-    var hash = {};
+    var unique = {}, results = [];
+
     _.each(array,function(el){
-      hash[el] = el;
+      unique[el] = el;
     });
 
-    //loop through hash table, add elements to output
-    var output = [];
-    _.each(hash,function(el){
-      output.push(el)
+    _.each(unique,function(el){
+      results.push(unique[el]);
     });
 
-    return output;
+    return results;
 
   };
 
@@ -129,19 +123,11 @@
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
 
-    ////This version doesn't use _.each
-    // var output = [];
-    // for (var i = 0; i < collection.length; i++) {
-    //   output.push(iterator(collection[i]))
-    // }    
-    // return output;
-
-    var output = [];
+    var results = [];
     _.each(collection, function(value,key,collection){
-      var morphed = iterator(value,key,collection);
-      output.push(morphed);
+      results.push( iterator(value,key,collection) );
     });
-    return output;
+    return results;
   };
 
   /*
@@ -186,19 +172,16 @@
   _.reduce = function(collection, iterator, accumulator) {
 
     //check if a start value for the accumulator was passed:
-    var hasStartVal = true; 
-    if (accumulator === undefined){
-      hasStartVal = false;
-    }
+    var initializing = arguments.length === 2;
 
     //loop through, applying 
-    _.each(collection, function(item){
-      if (hasStartVal === false){ // no accumulator passed in
-        accumulator = item; //set accumulator equal to first item
-        hasStartVal = true; //update hasStartVal
+    _.each(collection, function(value){
+      if (initializing){ // no accumulator passed in
+        accumulator = value; //set accumulator equal to first item 
+        initializing = false; //update hasStartVal
       }
       else{
-        accumulator = iterator(accumulator,item)
+        accumulator = iterator(accumulator,value)
       }
     });
     return accumulator;
@@ -211,13 +194,10 @@
     // TIP: Many iteration problems can be most easily expressed in
     // terms of reduce(). Here's a freebie to demonstrate!
     return _.reduce(collection, function(wasFound, item) {
-
       if (wasFound) { //if it was already found, just return true
         return true;
       }
-
       return item === target; //otherwise, return true only if the item equals the target
-
     }, false);
   };
 
@@ -225,12 +205,10 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
-    if (iterator === undefined){ //if no iterator, just return item
-      iterator = function(item){return item};
-    }
-    return _.reduce(collection, function(passed,item){
-      if (!passed) return false; //if any item evey fails, it continues to return false (failed)
-      else return iterator(item)? true: false;
+    iterator = iterator || _.identity //if no iterator set, just return value via identity
+
+    return !!_.reduce(collection, function(trueSoFar,item){
+      return (trueSoFar && iterator(item))
     },true); //default value is true - e.g. for empty array
   };
 
@@ -240,9 +218,7 @@
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
 
-    if (iterator === undefined){ //if no iterator, just return item
-      iterator = function(item){return item};
-    }
+    iterator = iterator || _.identity //if no iterator set, just return value via identity
 
     //reverse iterator
     var myIterator = function(item){
@@ -278,8 +254,8 @@
     // Array.prototype.shift.apply(arguments);//uncomment to skip the first object
     // //might be faster?
 
-    _.each(arguments,function(argument){ //loops through all the arguments 
-      _.each(argument,function(value,key){
+    _.each(arguments,function(source){ //loops through all the arguments 
+      _.each(source,function(value,key){
         obj[key] = value;
       })
     })  
@@ -294,7 +270,8 @@
 
     _.each(arguments,function(argument){
       _.each(argument,function(value,key){
-        if (!(key in obj)) obj[key] = value;
+        obj[key] === undefined && (obj[key] = value); //if first part of && statement is false, 
+                                                      //second part will not evaluate
       })
     })  
     return obj;
@@ -342,41 +319,16 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var results = {};
 
-    //create helper function arrayEquals
-    var arrayEquals = function(arr1,arr2){
-      var match = true;
-      if (arr1.length != arr2.length) match = false;
-      else {
-        _.each(arr1,function(item,key){
-          if (arr2[key] != item) match = false;
-        });
-      }
-      return match;
-    };
+    return function(){
+      var args = JSON.stringify(arguments);
 
-    var callList = []; //array for storing previous calls
-
-    return function(){      
-      var calledBefore = false;//assume we haven't seen the call before
-      var result; //initialize this variable
-      var args = arguments;
-
-      //check if the arguments given this time are already in callList
-      _.each(callList,function(curCall){
-        if (arrayEquals(curCall[0],args)){ 
-          calledBefore = true;
-          result = curCall[1];
-        } 
-      })
-
-      //if not, call function
-      if (!calledBefore){
-        result = func.apply(this,args);
-        callList.push([args,result]);
+      if (!(args in results)) {
+        results[args] = func.apply(this, arguments);
       }
 
-      return result;
+      return results[args];
     }
 
   };
@@ -396,13 +348,12 @@
           clearInterval(myInterval);
         }
         else{
-          func.apply(null, arguments);
+          return func.apply(this, arguments);
           called = true;
         }
       }
 
       var myInterval = setInterval.apply(myFunction,arguments);
-
 
   };
 
@@ -447,6 +398,12 @@
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
+
+      return _.map(collection,function(el){
+        var method = typeof(functionOrKey) === "string" ? el[functionOrKey] : functionOrKey;
+        return method.apply(el, args);
+      })
+
   };
 
   // Sort the object's values by a criterion produced by an iterator.
